@@ -1,3 +1,8 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/jmhobbs/pbr2dayz.svg)](https://pkg.go.dev/github.com/jmhobbs/pbr2dayz)
+[![Lints](https://github.com/jmhobbs/pbr2dayz/actions/workflows/lint.yml/badge.svg)](https://github.com/jmhobbs/pbr2dayz/actions/workflows/lint.yml)
+[![Tests](https://github.com/jmhobbs/pbr2dayz/actions/workflows/test.yml/badge.svg)](https://github.com/jmhobbs/pbr2dayz/actions/workflows/test.yml)
+[![codecov](https://codecov.io/github/jmhobbs/pbr2dayz/graph/badge.svg?token=sB2axgNro5)](https://codecov.io/github/jmhobbs/pbr2dayz)
+
 # PBR2DayZ
 
 Convert PBR textures to DayZ format.
