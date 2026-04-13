@@ -32,6 +32,19 @@ func (p PBR) Convert() DayZ {
 	}
 }
 
+// Convert transforms a DayZ texture set into the PBR texture layout.
+func (d DayZ) Convert() PBR {
+	targetBounds := firstAvailableBounds(d.CO, d.NOHQ, d.AS, d.SMDI)
+
+	return PBR{
+		BaseColor: convertToOpaqueRGB(d.CO, targetBounds),
+		Normal:    convertToOpaqueRGB(d.NOHQ, targetBounds),
+		AO:        unpackGrayChannel(d.AS, targetBounds, func(rgba color.NRGBA) uint8 { return rgba.G }),
+		Metallic:  unpackGrayChannel(d.SMDI, targetBounds, func(rgba color.NRGBA) uint8 { return rgba.G }),
+		Roughness: unpackGrayChannel(d.SMDI, targetBounds, func(rgba color.NRGBA) uint8 { return 0xff - rgba.B }),
+	}
+}
+
 // firstAvailableBounds returns the first non-empty image bounds normalized to the origin.
 func firstAvailableBounds(images ...image.Image) image.Rectangle {
 	for _, src := range images {
@@ -96,6 +109,22 @@ func packSMDI(metallic image.Image, roughness image.Image, targetBounds image.Re
 			metalness := sampleGray(metallic, x, y, targetBounds)
 			gloss := 0xff - sampleGray(roughness, x, y, targetBounds)
 			dst.SetRGBA(x, y, color.RGBA{R: 0xff, G: metalness, B: gloss, A: 0xff})
+		}
+	}
+
+	return dst
+}
+
+// unpackGrayChannel builds a grayscale image by extracting a single channel.
+func unpackGrayChannel(src image.Image, targetBounds image.Rectangle, extract func(color.NRGBA) uint8) image.Image {
+	if src == nil || targetBounds.Empty() {
+		return nil
+	}
+
+	dst := image.NewGray(targetBounds)
+	for y := targetBounds.Min.Y; y < targetBounds.Max.Y; y++ {
+		for x := targetBounds.Min.X; x < targetBounds.Max.X; x++ {
+			dst.SetGray(x, y, color.Gray{Y: extract(sampleRGBA(src, x, y, targetBounds))})
 		}
 	}
 

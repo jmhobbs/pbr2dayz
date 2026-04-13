@@ -5,7 +5,7 @@
 
 # PBR2DayZ
 
-Convert PBR textures to DayZ format.
+Convert PBR textures to DayZ format, and DayZ textures back to PBR.
 
 ## Usage
 
@@ -26,4 +26,23 @@ total 4008
 -rw-r--r--@   1 jmhobbs  staff  443456 Apr 12 15:43 ducky_base_nohq.png
 -rw-r--r--@   1 jmhobbs  staff  135524 Apr 12 15:43 ducky_base_as.png
 -rw-r--r--@   1 jmhobbs  staff  223530 Apr 12 15:43 ducky_base_smdi.png
+```
+
+A matching reverse CLI is provided in `cmd/dayz2pbr`:
+
+```
+usage: dayz2pbr <co> <nohq> <as> <smdi>
+```
+
+Example:
+
+```
+$ ./dayz2pbr ducky_base_co.png ducky_base_nohq.png ducky_base_as.png ducky_base_smdi.png
+$ ls -lart ducky_base*
+total 8016
+-rw-r--r--@   1 jmhobbs  staff  138239 Apr 12 15:43 ducky_base_basecolor.png
+-rw-r--r--@   1 jmhobbs  staff  443456 Apr 12 15:43 ducky_base_normal.png
+-rw-r--r--@   1 jmhobbs  staff  135524 Apr 12 15:43 ducky_base_ao.png
+-rw-r--r--@   1 jmhobbs  staff  223530 Apr 12 15:43 ducky_base_metallic.png
+-rw-r--r--@   1 jmhobbs  staff  223530 Apr 12 15:43 ducky_base_roughness.png
 ```
