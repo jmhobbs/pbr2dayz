@@ -20,6 +20,7 @@ type DayZ struct {
 	SMDI image.Image
 }
 
+// Convert transforms a PBR texture set into the DayZ texture layout.
 func (p PBR) Convert() DayZ {
 	targetBounds := firstAvailableBounds(p.BaseColor, p.Normal, p.AO, p.Metallic, p.Roughness)
 
@@ -31,6 +32,7 @@ func (p PBR) Convert() DayZ {
 	}
 }
 
+// firstAvailableBounds returns the first non-empty image bounds normalized to the origin.
 func firstAvailableBounds(images ...image.Image) image.Rectangle {
 	for _, src := range images {
 		if src == nil {
@@ -48,6 +50,7 @@ func firstAvailableBounds(images ...image.Image) image.Rectangle {
 	return image.Rectangle{}
 }
 
+// convertToOpaqueRGB copies RGB data into a fully opaque RGBA image.
 func convertToOpaqueRGB(src image.Image, targetBounds image.Rectangle) image.Image {
 	if src == nil || targetBounds.Empty() {
 		return nil
@@ -64,6 +67,7 @@ func convertToOpaqueRGB(src image.Image, targetBounds image.Rectangle) image.Ima
 	return dst
 }
 
+// packAS builds the AS texture with ambient occlusion stored in the green channel.
 func packAS(ao image.Image, targetBounds image.Rectangle) image.Image {
 	if ao == nil || targetBounds.Empty() {
 		return nil
@@ -80,6 +84,7 @@ func packAS(ao image.Image, targetBounds image.Rectangle) image.Image {
 	return dst
 }
 
+// packSMDI builds the SMDI texture from metallic and roughness inputs.
 func packSMDI(metallic image.Image, roughness image.Image, targetBounds image.Rectangle) image.Image {
 	if metallic == nil || roughness == nil || targetBounds.Empty() {
 		return nil
@@ -97,22 +102,26 @@ func packSMDI(metallic image.Image, roughness image.Image, targetBounds image.Re
 	return dst
 }
 
+// sampleRGBA reads a color from the source image mapped to the destination coordinates.
 func sampleRGBA(src image.Image, dstX int, dstY int, targetBounds image.Rectangle) color.NRGBA {
 	srcX, srcY := mapDestinationToSource(src.Bounds(), dstX, dstY, targetBounds)
 	return color.NRGBAModel.Convert(src.At(srcX, srcY)).(color.NRGBA)
 }
 
+// sampleGray reads a grayscale value from the source image mapped to the destination coordinates.
 func sampleGray(src image.Image, dstX int, dstY int, targetBounds image.Rectangle) uint8 {
 	srcX, srcY := mapDestinationToSource(src.Bounds(), dstX, dstY, targetBounds)
 	return color.GrayModel.Convert(src.At(srcX, srcY)).(color.Gray).Y
 }
 
+// mapDestinationToSource scales destination coordinates into source image coordinates.
 func mapDestinationToSource(srcBounds image.Rectangle, dstX int, dstY int, dstBounds image.Rectangle) (int, int) {
 	srcX := scaleCoordinate(dstX-dstBounds.Min.X, dstBounds.Dx(), srcBounds.Min.X, srcBounds.Dx())
 	srcY := scaleCoordinate(dstY-dstBounds.Min.Y, dstBounds.Dy(), srcBounds.Min.Y, srcBounds.Dy())
 	return srcX, srcY
 }
 
+// scaleCoordinate maps a destination axis position to the nearest source axis position.
 func scaleCoordinate(dstPos int, dstSize int, srcMin int, srcSize int) int {
 	if dstSize <= 1 || srcSize <= 1 {
 		return srcMin
